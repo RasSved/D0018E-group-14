@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock %}
+
+
+{% block body %}
+<div class="container">
+    <p>Items in Cart</p>
+    <div class="products">
+        <div class="product-box">
+            <h2>Product name</h2>
+            <p>info</p>
+            <a href="delivery.html">
+                <button type="button">Change Delivery</button>
+            </a>
+            <a href="payment.html">
+                <button type="button">Buy!</button>
+            </a>
+        </div>
+{% endblock %} 
+
+{% block navbuttons %}
+<li class="nav-item">
+    <a class="nav-link" href="/">Home</a>
+</li>
+{% endblock %}
