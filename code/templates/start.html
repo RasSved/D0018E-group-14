@@ -12,10 +12,10 @@
     <a class="nav-link" href="productlist.html">Product list</a>
 </li>
 <li class="nav-item">
-    <a class="nav-link" href="reklamera.html">Reklamera</a>
+    <a class="nav-link" href="login">Reklamera</a>
 </li>
 <li class="nav-item">
-    <a class="nav-link" href="review.html">Review</a>
+    <a class="nav-link" href="login">Review</a>
 </li>
 <li class="nav-item">
     <a class="nav-link" href="allinfo.html">General info</a>
@@ -23,4 +23,14 @@
 <li class="nav-item">
     <a class="nav-link" href="faq.html">FAQ</a>
 </li>
+{% if loggedin == True%}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('logout')}}" method="post">Logout</a>
+</li>
+{% endif %}
+{% if loggedin != True%}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('login')}}" method="post">Login</a>
+</li>
+{% endif %}
 {% endblock %}
