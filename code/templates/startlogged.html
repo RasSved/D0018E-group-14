@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock %}
+
+
+{% block body %}
+{% endblock %} 
+
+{% block navbuttons %}
+<li class="nav-item">
+    <a class="nav-link" href="productlist.html">Product list</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="reklamera.html">Reklamera</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="review.html">Review</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="allinfo.html">General info</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="faq.html">FAQ</a>
+</li>
+
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('logout')}}" method="post">Logout</a>
+</li>
+
+
+{% endblock %}
