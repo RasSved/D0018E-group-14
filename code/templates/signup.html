@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock %}
+
+
+{% block body %}
+<form action="/signup" method="POST">
+    <div>
+        <label for="enteremail">email</label>
+        <input type="email" name="email" id="enteremail">
+    </div>
+    <div>
+        <label for="enterpassword">password</label>
+        <input type="password" name="password" id="enterpassword">
+    </div>
+    <div>
+        <label for="entername">name</label>
+        <input type="text" name="name" id="enterfname">
+    </div>
+    <div>
+        <input type = "submit" value = "Submit" />
+    </div>
+</form>
+
+
+{% endblock %} 
+
+{% block navbuttons %}
+<li class="nav-item">
+    <a class="nav-link" href="/">Home</a>
+</li>
+{% endblock %}
