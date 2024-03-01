@@ -5,24 +5,30 @@
 
 
 {% block body %}
+<h1>Product List</h1>
+{% for product in products %}
 <div class="container">
     <div class="products">
         <div class="product-box">
-            <h2>Product 1</h2>
-            <p>STOR</p>
-            <a href="product.html">
-                <button type="button">Product info</button>
-            </a>
-        </div>
-        <div class="product-box">
-            <h2>Product 2</h2>
-            <p>LITEN</p>
-            <a href="product.html">
-                <button type="button">Product Info</button>
-            </a>
+            <h2>{{ product.name }}</h2>
+            <p>{{ product.spec1 }}</p>
+            <p>{{ product.spec2 }}</p>
+            <p>Pris: {{ product.price }}kr</p>
+            <p>Info: {{ product.product_info }}</p>
+            <form name = "productadd" method = "POST" action="{{ url_for('enterbasket')}}">
+                <button type = "submit" name = "productID" value = "{{ product.product_id }}"> Add To Basket </button>
+            </form>
         </div>
     </div>
 </div>
+{% endfor %}
+<!--
+    <form action="/add_product" method="post">
+        <label for="product_name">Product Name:</label>
+        <input type="text" id="product_name" name="product_name" required>
+        <button type="submit">Add Product</button>
+    </form>
+-->
 {% endblock %} 
 
 {% block navbuttons %}
