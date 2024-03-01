@@ -1,40 +1,91 @@
-from flask import Flask, render_template 
-from flask_sqlalchemy import SQLAlchemy
-
-from sqlalchemy.sql import func
-import pymysql
+from flask import Flask, render_template, request, redirect, url_for, session 
+from flask_mysqldb import MySQL
+import sys
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://20010615:sumsar1928@127.0.0.1/db20010615' 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app) 
-pymysql.connect(db='db20010615', user='20010615', passwd='sumsar1928', host='127.0.0.1', port=3306)
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'Password32!'
+app.config['MYSQL_DB'] = 'dalakristall'
+app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+mysql = MySQL(app)
 
-class Student(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    firstname = db.Column(db.String(100), nullable=False)
-    lastname = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(80), unique=True, nullable=False)
-    age = db.Column(db.Integer)
-    created_at = db.Column(db.DateTime(timezone=True),
-                           server_default=func.now())
-    bio = db.Column(db.Text)
+app.secret_key = "secret"
 
-    def __repr__(self):
-        return f'<Student {self.firstname}>'
 
 
 @app.route('/')
-def testdb():
-    try:
-        db.session.query(db.text('1')).from_statement(db.text('SELECT 1')).all()
-        return '<h1>It works.</h1>'
-    except Exception as e:
-        # e holds description of the error
-        error_text = "<p>The error:<br>" + str(e) + "</p>"
-        hed = '<h1>Something is broken.</h1>'
-        return hed + error_text
+def index(): 
+        return render_template('start.html', title = "start")
+
+@app.route('/loggedin')
+def loggedin(): 
+        userID = session['userID']
+        return render_template('start.html', title = "start")
+
+@app.route('/signup', methods = ['POST', 'GET'])
+def signup():
+    if request.method == "GET":
+        return render_template('signup.html')
+    if request.method == 'POST':
+        name = request.form['name']
+        password = request.form['password']
+        email = request.form['email']
+        
+        cur = mysql.connection.cursor()
+
+        cur.execute("INSERT INTO customer (email, password, name) VALUES (%s, %s, %s)", (email, password, name))
+        mysql.connection.commit()
+
+        session['name'] = request.form['email']
+
+        cur.execute("SELECT customer_id FROM customer WHERE email = %s", (session['name'],))
+        userID = cur.fetchall()
+        session['userID'] = userID
+        cur.close()
+    return render_template('start.html', title = "start" )
+
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT EXISTS(SELECT * FROM customer WHERE email = %s AND password = %s)", (email, password))
+        loginStatus = cur.fetchall()
+        
+        if loginStatus:
+            session['logg'] = request.form['email']
+
+            loggedin = True
+
+            cur.execute("SELECT customer_id FROM customer WHERE email = %s", (session['logg'],))
+            userID = cur.fetchall()
+            session['userID'] = userID
+
+            cur.close()
+            return redirect(url_for('loggedin'))
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    if 'logg' in session:
+        session.pop('logg', None)
+    return redirect('/')
+
+@app.route('/add_product', methods=['POST'])
+def add_product():
+    if request.method == 'POST':
+        product_name = request.form['product_name']
+        cur = mysql.connection.cursor()
+        cur.execute('INSERT INTO products (name) VALUES (%s)', (product_name,))
+        mysql.connection.commit()
+        cur.close()
+        return redirect(url_for('index'))
 
 @app.route('/customer.html')
 def customer():
@@ -61,9 +112,24 @@ def generalinfo():
 def faq():
     return render_template('faq.html', title = "faq" )
 
-@app.route('/productlist.html')
+@app.route('/productlist.html', methods=['GET'])
 def productlist():
-    return render_template('productlist.html', title = "productlist" )
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT * FROM products')
+    products = cur.fetchall()
+    cur.close()
+    return render_template('productlist.html', title = "productlist", products=products )
+
+@app.route("/enter", methods = ["GET", "POST"])
+def enterbasket():
+    print(request.form, file=sys.stderr)
+    if "productID" in request.form:
+        productID = request.form["productID"]
+
+        session["productID"] = productID
+        return redirect(url_for("basket"))
+    else:
+        return redirect(url_for('productlist'))
 
 @app.route('/product.html')
 def product():
@@ -75,7 +141,16 @@ def spec():
 
 @app.route('/basket.html')
 def basket():
-    return render_template('basket.html', title = "basket" )
+    if "productID" in session:
+        productID = session["productID"]
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM products WHERE product_id = 'productID'")
+        products = cur.fetchall()
+        cur.close()  
+
+        return render_template("basket.html", title = "basket", products=products)
+    else:
+        return redirect(url_for('productlist'))
 
 @app.route('/delivery.html')
 def delivery():
