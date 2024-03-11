@@ -9,6 +9,10 @@
 
 {% block navbuttons %}
 <li class="nav-item">
-    <a class="nav-link" href="/">Home</a>
+    <a class="nav-link" href="{{ url_for('accmanage')}}" method="post">Account Manage</a>
 </li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('logout')}}" method="post">Logout</a>
+</li>
+
 {% endblock %}
