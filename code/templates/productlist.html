@@ -6,7 +6,30 @@
 
 {% block body %}
 <h1>Product List</h1>
+{% if role == 'owner' %}
+    <form action="/add_product" method="post">
+        <label for="product_name">Product Name:</label>
+        <input type="text" id="product_name" name="product_name" required>
+
+        <label for="product_info">Product Info:</label>
+        <input type="text" id="product_info" name="product_info" required>
+
+        <label for="product_spec1">Product spec1:</label>
+        <input type="text" id="product_spec1" name="product_spec1" required>
+
+        <label for="product_spec2">Product Spec2:</label>
+        <input type="text" id="product_spec2" name="product_spec2" required>
+
+        <label for="product_price">Product Price:</label>
+        <input type="number" id="product_price" name="product_price" required>
+
+        <label for="product_stock">Stock:</label>
+        <input type="number" id="product_stock" name="product_stock" required>
+        <button type="submit">Add Product</button>
+    </form>
+{% endif %}
 {% for product in products %}
+{% if role == 'customer' %}
 <div class="container">
     <div class="products">
         <div class="product-box">
@@ -15,26 +38,80 @@
             <p>{{ product.spec2 }}</p>
             <p>Pris: {{ product.price }}kr</p>
             <p>Info: {{ product.product_info }}</p>
+            <p>Stock: {{ product.stock }}</p>
             <form name = "productadd" method = "POST" action="{{ url_for('enterbasket')}}">
                 <button type = "submit" name = "productID" value = "{{ product.product_id }}"> Add To Basket </button>
             </form>
         </div>
     </div>
 </div>
+{% endif %}
+{% if role == 'owner' %}
+<div class="container">
+    <div class="products">
+        <div class="product-box">
+            <h2>{{ product.name }}</h2>
+            <p>{{ product.spec1 }}</p>
+            <p>{{ product.spec2 }}</p>
+            <p>Pris: {{ product.price }}kr</p>
+            <p>Info: {{ product.product_info }}</p>
+            <p>Stock: {{ product.stock }}</p>
+        </div>
+    </div>
+</div>
+<form action="{{url_for('editproduct', id = product.product_id)}}" method="post">
+    <label for="product_name">Product Name:</label>
+    <input type="text" id="product_name" name="product_name" required>
+
+    <label for="product_info">Product Info:</label>
+    <input type="text" id="product_info" name="product_info" required>
+
+    <label for="product_spec1">Product spec1:</label>
+    <input type="text" id="product_spec1" name="product_spec1" required>
+
+    <label for="product_spec2">Product Spec2:</label>
+    <input type="text" id="product_spec2" name="product_spec2" required>
+
+    <label for="product_price">Product Price:</label>
+    <input type="number" id="product_price" name="product_price" required>
+
+    <label for="product_stock">Stock:</label>
+    <input type="number" id="product_stock" name="product_stock" required>
+    <button type="submit">Edit Product</button>
+</form>
+{% endif %}
+{% if role == 'admin' %}
+<div class="container">
+    <div class="products">
+        <div class="product-box">
+            <h2>{{ product.name }}</h2>
+            <p>{{ product.spec1 }}</p>
+            <p>{{ product.spec2 }}</p>
+            <p>Pris: {{ product.price }}kr</p>
+            <p>Info: {{ product.product_info }}</p>
+            <p>Stock: {{ product.stock }}</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% if role == 'default' %}
+<div class="container">
+    <div class="products">
+        <div class="product-box">
+            <h2>{{ product.name }}</h2>
+            <p>{{ product.spec1 }}</p>
+            <p>{{ product.spec2 }}</p>
+            <p>Pris: {{ product.price }}kr</p>
+            <p>Info: {{ product.product_info }}</p>
+            <p>Stock: {{ product.stock }}</p>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endfor %}
-<!--
-    <form action="/add_product" method="post">
-        <label for="product_name">Product Name:</label>
-        <input type="text" id="product_name" name="product_name" required>
-        <button type="submit">Add Product</button>
-    </form>
--->
 {% endblock %} 
 
 {% block navbuttons %}
-<li class="nav-item">
-    <a class="nav-link" href="basket.html">Shoping cart</a>
-</li>
 <li class="nav-item">
     <a class="nav-link" href="/">Home</a>
 </li>
