@@ -64,13 +64,13 @@ def signup():
 
             cur.close()
 
-            flash("Signup successful!", 'success')
+            
             return render_template('login.html', title="start")
 
         except mysql.connection.IntegrityError as e:
             # email is already in use case
             cur.close()
-            flash("Signup Failed, Email already in use. Please try again", 'error')
+            
             return render_template('signup.html')
     return render_template('login.html', title = "start" )
 
@@ -250,7 +250,7 @@ def enterbasket():
 
         # Check if user is logged in (pointless?) cant get here without being logged in. welp better safe than sorry!
         if 'name' not in session:
-            flash("Please log in to add items to your basket.", "error")
+            
             return redirect(url_for("index"))
 
         email = session['name']
@@ -280,7 +280,7 @@ def enterbasket():
 
         cur.close()
 
-        flash("Item added to basket!", "success")
+        
         return redirect(url_for("basket", basket_id = basket_id, product_id = product_id))
     else:
         return redirect(url_for('index'))
@@ -346,14 +346,13 @@ def placeorder(ID):
     mysql.connection.commit()
     cur.close()
 
-    flash("Order placed successfully!", "success")
+    
     return redirect(url_for('gratz'))
 
 
 @app.route('/gratz.html')
 def gratz():
-    messages = get_flashed_messages()
-    return render_template('gratz.html', messages=messages)
+    return render_template('gratz.html')
 
 
 @app.route('/accmanage.html')
@@ -399,10 +398,10 @@ def removeitem():
             mysql.connection.commit()
             cur.close()
 
-            flash("Item quantity decreased in the basket!", "success")
+           
             return redirect(url_for('basket', basket_id = basket_id, product_id=product_id))
 
-    flash("Failed to update item quantity in the basket. Please try again.", "error")
+    
     return redirect(url_for('index'))
 
 
