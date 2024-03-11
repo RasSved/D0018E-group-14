@@ -9,6 +9,18 @@
 
 {% block navbuttons %}
 <li class="nav-item">
-    <a class="nav-link" href="/">Home</a>
+    <a class="nav-link" href="{{url_for('productlist', role = 'owner' ) }}">Product List</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{url_for('generalinfo', role = 'owner' ) }}">General Info</a>
+</li>>
+<li class="nav-item">
+    <a class="nav-link" href="{{url_for('reklamera', role = 'owner' ) }}">Reklamera</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{url_for('review', role = 'owner' ) }}">Review</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('logout')}}" method="post">Logout</a>
 </li>
 {% endblock %}
