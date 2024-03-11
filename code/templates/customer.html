@@ -5,10 +5,23 @@
 
 
 {% block body %}
+
 {% endblock %} 
 
 {% block navbuttons %}
 <li class="nav-item">
-    <a class="nav-link" href="/">Home</a>
+    <a class="nav-link" href="{{url_for('productlist', role = 'customer' ) }}">Product List</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{url_for('generalinfo', role = 'default' ) }}">General Info</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{url_for('reklamera', role = 'customer' ) }}">Reklamera</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{url_for('review', role = 'customer' ) }}">Review</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('logout')}}" method="post">Logout</a>
 </li>
 {% endblock %}
