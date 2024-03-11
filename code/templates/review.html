@@ -5,6 +5,37 @@
 
 
 {% block body %}
+<h1>Reviews</h1>
+{% if role == 'customer' %}
+<form action="/addreview" method="POST">
+    <div>
+        <label for="entertitle">Title:</label>
+        <input type="title" name="title" id="entertitle">
+    </div>
+    <div>
+        <label for="entercontent">Content:</label>
+        <input type="content" name="content" id="entercontent">
+    </div>
+    <div>
+        <label for="entername">Product name:</label>
+        <input type="name" name="name" id="entername">
+    </div>
+    <div>
+        <input type = "submit" value = "Submit" />
+    </div>
+</form>
+{% endif %}
+{% for item in review %}
+<div class="container">
+    <div class="products">
+        <div class="product-box">
+            <h2>Title: {{ item.title }}</h2>
+            <p>Content: {{ item.content }}</p>
+            <p>Product: {{ item.prod_name }}</p>
+        </div>
+    </div>
+</div>
+{% endfor %} 
 {% endblock %} 
 
 {% block navbuttons %}
