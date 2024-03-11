@@ -151,11 +151,6 @@ def updateinfo():
         cur.close()
         return redirect(url_for('index'))
 
-@app.route('/customer.html')
-def customer():
-    return render_template('customer.html')
-
-
 @app.route('/admin.html')
 def admin():
     return render_template('admin.html')
@@ -272,15 +267,6 @@ def enterbasket():
     else:
         return redirect(url_for('index'))
 
-
-@app.route('/product.html')
-def product():
-    return render_template('product.html', title = "product" )
-
-@app.route('/spec.html')
-def spec():
-    return render_template('spec.html', title = "spec" )
-
 @app.route('/basket.html/<basket_id><product_id>', methods=['GET'])
 def basket(basket_id, product_id):
     cur = mysql.connection.cursor()
@@ -342,14 +328,6 @@ def placeorder(ID):
 
     flash("Order placed successfully!", "success")
     return redirect(url_for('gratz'))
-
-@app.route('/delivery.html')
-def delivery():
-    return render_template('delivery.html', title = "delivery" )
-
-@app.route('/payment.html')
-def payment():
-    return render_template('payment.html', title = "payment" )
 
 @app.route('/gratz.html')
 def gratz():
