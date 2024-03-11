@@ -5,6 +5,34 @@
 
 
 {% block body %}
+{% if role == 'customer' %}
+<form action="/addreklamera" method="POST">
+    <div>
+        <label for="entertitle">Title:</label>
+        <input type="title" name="title" id="entertitle">
+    </div>
+    <div>
+        <label for="entercontent">Content:</label>
+        <input type="content" name="content" id="entercontent">
+    </div>
+    <div>
+        <input type = "submit" value = "Submit" />
+    </div>
+</form>
+{% endif %}
+
+{% if role == 'owner' %}
+{% for item in reklamera %}
+<div class="container">
+    <div class="products">
+        <div class="product-box">
+            <h2>{{ item.title }}</h2>
+            <p>{{ item.content }}</p>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
 {% endblock %} 
 
 {% block navbuttons %}
