@@ -5,16 +5,33 @@
 
 
 {% block body %}
-<h1>Items In Basket</h1>
-<div class="container">
-    <div class="products">
-        <div class="product-box">
-            <h2>{{ products['name'] }}</h2>
-            <p>{{ products['spec1'] }}</p>
-            <p>{{ products['spec1'] }}</p>
+<li class="button1">
+    <a class="button1" href="{{url_for('productlist', role = 'customer' ) }}">Product List</a>
+</li>
+{% set total_price = total_price %}
+
+{% for product in products %}
+    <div class="container">
+        <div class="products">
+            <div class="product-box">
+                <p>Name: {{ product.name }}</p>
+                <p>Price: {{ product.price }}</p>
+                <p>Quantity In Basket: {{ product.quantity }}</p>
+                <form action="{{ url_for('removeitem') }}" method="post">
+                    <input type="hidden" name="basket_id" value="{{ basket_id }}">
+                    <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                    <button type="submit">Remove Item</button>
+                </form>
+            </div>
         </div>
     </div>
-</div>
+    <p>Product ID: {{ product.product_id }}</p>
+{% endfor %}
+<p>Basket ID: {{ basket_id }}</p>
+<p>Total Price: {{ total_price }}</p>
+<form action="{{ url_for('placeorder', ID=basket_id) }}" method="post">
+    <button type="submit">Place Order</button>
+</form>
 {% endblock %} 
 
 {% block navbuttons %}
