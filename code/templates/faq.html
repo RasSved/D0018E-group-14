@@ -5,6 +5,17 @@
 
 
 {% block body %}
+<h1>FAQ List</h1>
+{% for item in info %}
+<div class="container">
+    <div class="products">
+        <div class="product-box">
+            <h2>{{ item.title }}</h2>
+            <p>{{ item.content }}</p>
+        </div>
+    </div>
+</div>
+{% endfor %} 
 {% endblock %} 
 
 {% block navbuttons %}
