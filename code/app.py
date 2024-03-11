@@ -22,6 +22,7 @@ def index():
         role = session["role"]
         print("Role:", role)
         loggedin = True
+        #Role redirect
         if role == 'customer':
             return render_template('customer.html', title="start", loggedin=loggedin)
         elif role == 'admin':
@@ -37,6 +38,7 @@ def index():
 def signup():
     if request.method == "GET":
         return render_template('signup.html')
+        #Takes input creates account
     if request.method == 'POST':
         name = request.form['name']
         password = request.form['password']
@@ -45,18 +47,18 @@ def signup():
         cur = mysql.connection.cursor()
 
         try:
-            # Insert the new account
+            # new account
             cur.execute("INSERT INTO accounts (email, password, name, role) VALUES (%s, %s, %s, %s)", (email, password, name, 'customer'))
             mysql.connection.commit()
 
-            # Set session information
+            # session information
             session['name'] = request.form['email']
             cur.execute("SELECT role FROM accounts WHERE email = %s", (session['name'],))
             role = cur.fetchall()
             session['role'] = role
 
 
-            # Create a basket for the user
+            # Create a basket
             cur.execute("INSERT INTO basket (email) VALUES (%s)", (email,))
             mysql.connection.commit()
 
@@ -66,7 +68,7 @@ def signup():
             return render_template('login.html', title="start")
 
         except mysql.connection.IntegrityError as e:
-            # Handle the case where the email is already in use
+            # email is already in use case
             cur.close()
             flash("Signup Failed, Email already in use. Please try again", 'error')
             return render_template('signup.html')
@@ -79,6 +81,7 @@ def login():
         email = request.form['email']
         password = request.form['password']
         cur = mysql.connection.cursor()
+        #check if account exist
         cur.execute("SELECT EXISTS(SELECT * FROM accounts WHERE email = %s AND password = %s)", (email, password))
         loginStatus = cur.fetchall()
         
@@ -86,7 +89,7 @@ def login():
         cur.execute("SELECT EXISTS(SELECT role FROM accounts WHERE email = %s AND password = %s)", (email, password))
         role = cur.fetchall()
 
-
+        #if yes, set role to session
         if loginStatus:
             session['logg'] = request.form['email']
             cur.execute("SELECT role FROM accounts WHERE email = %s", (session['logg'],))
@@ -103,6 +106,7 @@ def login():
 
 @app.route('/logout')
 def logout():
+    #check if you are logged in then logs out
     if 'role' in session:
         session.pop('role', None)
     return redirect('/')
@@ -112,6 +116,7 @@ if __name__ == "__main__":
 
 @app.route('/add_product', methods=['POST'])
 def add_product():
+    #insert values in to database from html form
     if request.method == 'POST':
         name = request.form['product_name']
         info = request.form['product_info']
@@ -127,6 +132,7 @@ def add_product():
 
 @app.route('/editproduct<id>', methods=['POST'])
 def editproduct(id):
+    #edits values in database from html form
     if request.method == 'POST':
         name = request.form['product_name']
         info = request.form['product_info']
@@ -143,6 +149,7 @@ def editproduct(id):
 
 @app.route('/updateinfo', methods=['POST'])
 def updateinfo():
+    #edit info in database from html form
     if request.method == 'POST':
         content = request.form['content']
         cur = mysql.connection.cursor()
@@ -151,12 +158,18 @@ def updateinfo():
         cur.close()
         return redirect(url_for('index'))
 
+@app.route('/customer.html')
+def customer():
+    return render_template('customer.html')
+
+
 @app.route('/admin.html')
 def admin():
     return render_template('admin.html')
 
 @app.route('/reklamera.html/<role>', methods=['GET', 'POST'])
 def reklamera(role):
+    #selects reklmera to show owner in html
     cur = mysql.connection.cursor()
     cur.execute('SELECT * FROM reklamera')
     reklamera = cur.fetchall()
@@ -166,6 +179,7 @@ def reklamera(role):
 
 @app.route('/addreklamera', methods=['POST'])
 def addreklamera():
+    #adds into reklamera from html form 
     if request.method == 'POST':
         title = request.form['title']
         content = request.form['content']
@@ -179,6 +193,7 @@ def addreklamera():
 
 @app.route('/review.html/<role>')
 def review(role):
+    #gets all reviews from database
     cur = mysql.connection.cursor()
     cur.execute('SELECT * FROM review')
     review = cur.fetchall()
@@ -187,6 +202,7 @@ def review(role):
 
 @app.route('/addreview', methods=['POST'])
 def addreview():
+    #adds review to that database from html form
     if request.method == 'POST':
         title = request.form['title']
         content = request.form['content']
@@ -201,6 +217,7 @@ def addreview():
 
 @app.route('/allinfo.html/<role>')
 def generalinfo(role):
+    #gets geninfo from database and show in html
     cur = mysql.connection.cursor()
     cur.execute('SELECT content FROM geninfo')
     info = cur.fetchall()
@@ -209,6 +226,7 @@ def generalinfo(role):
 
 @app.route('/faq.html', methods=['GET'])
 def faq():
+    #gets FAQ from database and show in html
     cur = mysql.connection.cursor()
     cur.execute('SELECT * FROM info')
     info = cur.fetchall()
@@ -230,14 +248,14 @@ def enterbasket():
     if "productID" in request.form:
         product_id = request.form["productID"]
 
-        # Check if user is logged in
+        # Check if user is logged in (pointless?) cant get here without being logged in. welp better safe than sorry!
         if 'name' not in session:
             flash("Please log in to add items to your basket.", "error")
             return redirect(url_for("index"))
 
         email = session['name']
 
-        # Get the basket ID associated with the user's email
+        # basket ID that match with the user's email
         cur = mysql.connection.cursor()
         cur.execute("SELECT basket_id FROM basket WHERE email = %s", (email,))
         basket_id = cur.fetchone()
@@ -250,13 +268,13 @@ def enterbasket():
 
         if existing_order:
             print("Existing debug")
-            # If the product exists, update the quantity
+            #  product exists, update the quantity
             order_id = existing_order['order_id']
             quantity = existing_order['quantity'] + 1
             cur.execute("UPDATE orders SET quantity = %s WHERE order_id = %s", (quantity, order_id))
             mysql.connection.commit()
         else:
-            # If the product doesn't exist, insert a new order
+            # product doesn't exist, new order
             cur.execute("INSERT INTO orders (basket_id, product_id, quantity) VALUES (%s, %s, %s)", (basket_id, product_id, 1))
             mysql.connection.commit()
 
@@ -267,11 +285,12 @@ def enterbasket():
     else:
         return redirect(url_for('index'))
 
+
 @app.route('/basket.html/<basket_id><product_id>', methods=['GET'])
 def basket(basket_id, product_id):
     cur = mysql.connection.cursor()
     if product_id == 'NULL':
-        # Handle the case where no specific product ID is provided
+        # Handle the case where no specific product ID is provided (not used anymore didnt work anyways!)
         cur.execute('SELECT products.name, products.price, orders.quantity FROM products JOIN orders ON products.product_id = orders.product_id WHERE orders.basket_id = %s', (basket_id,))
         products = cur.fetchall()
         cur.close()
@@ -293,23 +312,23 @@ def basket(basket_id, product_id):
 def placeorder(ID):
     cur = mysql.connection.cursor()
 
-    # Get products in the basket
+    # products in the basket
     cur.execute('SELECT product_id, quantity FROM orders WHERE basket_id = %s', (ID,))
     products_in_basket = cur.fetchall()
 
-    # Check if there's enough stock for each product
+    # enough stock each product?
     for product in products_in_basket:
         product_id = product['product_id']
         quantity = product['quantity']
 
-        # Check if the stock is sufficient
+        # stock is enough?
         cur.execute("SELECT stock FROM products WHERE product_id = %s", (product_id,))
         current_stock = cur.fetchone()['stock']
 
         if current_stock < quantity:
             return redirect(url_for('index', data = "Failed to place the order"))
 
-    # Update product stock and create order records
+    # Update product stock
     for product in products_in_basket:
         product_id = product['product_id']
         quantity = product['quantity']
@@ -317,10 +336,11 @@ def placeorder(ID):
         # Update product stock
         cur.execute("UPDATE products SET stock = stock - %s WHERE product_id = %s", (quantity, product_id))
 
+        #not used anymore didnt work, meant to be reciet ish 
         # Create order record (you may need additional fields in your 'orders' table)
         # cur.execute("INSERT INTO order_history (product_id, quantity, basket_id) VALUES (%s, %s, %s)", (product_id, quantity, ID))
 
-    # Clear the basket after placing the order
+    # Clear the basket after order
     cur.execute("DELETE FROM orders WHERE basket_id = %s", (ID,))
 
     mysql.connection.commit()
@@ -328,6 +348,7 @@ def placeorder(ID):
 
     flash("Order placed successfully!", "success")
     return redirect(url_for('gratz'))
+
 
 @app.route('/gratz.html')
 def gratz():
@@ -337,6 +358,7 @@ def gratz():
 
 @app.route('/accmanage.html')
 def accmanage():
+    #gets account info to html
     cur = mysql.connection.cursor()
     cur.execute('SELECT * FROM accounts')
     accounts = cur.fetchall()
@@ -345,6 +367,7 @@ def accmanage():
 
 @app.route('/removeacc/<ID>', methods=['POST'])
 def removeacc(ID):
+    #delete account in Db from HTML
     if request.method == 'POST':
         cur = mysql.connection.cursor()
 
@@ -367,7 +390,7 @@ def removeitem():
             current_quantity = cur.fetchone()['quantity']
 
             if current_quantity > 1:
-                # If quantity is more than 1, decrement it
+                # If quantity is more than 1, do -1
                 cur.execute("UPDATE orders SET quantity = %s WHERE product_id = %s AND basket_id = %s", (current_quantity - 1, product_id, basket_id))
             else:
                 # If quantity is 1, remove the item
